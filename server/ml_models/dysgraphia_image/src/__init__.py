@@ -1,0 +1,1 @@
+"""Dysgraphia image model package."""

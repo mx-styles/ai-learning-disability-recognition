@@ -1,0 +1,21 @@
+experiment:
+  name: dysgraphia_image_baseline
+  seed: 42
+
+data:
+  raw_root: data/raw
+  processed_root: data/processed
+  image_size: [224, 224]
+  batch_size: 16
+
+model:
+  architecture: convnextv2_base
+  num_classes: 2
+
+training:
+  epochs: 20
+  learning_rate: 0.001
+  weight_decay: 0.0001
+
+inference:
+  threshold: 0.5
