@@ -159,8 +159,7 @@ Frontend will run on `http://localhost:3000`
 1. **Feature Extraction**: Age and grade-normalized features
 2. **Rule-Based Screening**: Threshold-based initial classification
 3. **ML Classification**: Random Forest + SVM models
-4. **Hybrid Decision**: Weighted combination (60% ML + 40% Rules)
-5. **Explainability**: Feature importance and plain-language explanations
+4. **Explainability**: Feature importance and plain-language explanations
 
 ## 📈 System Outputs
 
@@ -183,6 +182,3 @@ Frontend will run on `http://localhost:3000`
 
 Academic project for educational purposes.
 
-## 👥 Contact
-
-For questions or support, contact the development team.
