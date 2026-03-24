@@ -15,17 +15,12 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    # Enable CORS for frontend development servers and expose download headers.
+    # Enable CORS for frontend development hosts and expose download headers.
     CORS(
         app,
         resources={
             r"/api/*": {
-                "origins": [
-                    "http://localhost:3000",
-                    "http://127.0.0.1:3000",
-                    "http://localhost:5173",
-                    "http://127.0.0.1:5173",
-                ],
+                "origins": "*",
                 "allow_headers": ["Content-Type", "Authorization"],
                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
                 "expose_headers": ["Content-Disposition", "Content-Type"],
