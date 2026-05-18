@@ -78,13 +78,6 @@ const Layout = ({ children }) => {
                 <p className="text-xs sm:text-sm text-gray-500">Educational Assessment Tool</p>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 whitespace-nowrap">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                Offline Mode
-              </span>
-            </div>
           </div>
         </div>
       </header>

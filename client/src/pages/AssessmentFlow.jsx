@@ -1107,48 +1107,6 @@ const AssessmentFlow = () => {
                 })}
               </div>
 
-              {/* Task Navigation Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 mt-4 pt-4 border-t border-gray-200">
-                <button
-                  onClick={goToPreviousTask}
-                  disabled={currentTaskIndexInDomain === 0}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium ${
-                    currentTaskIndexInDomain === 0
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-ink-700 text-white hover:bg-ink-500'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Previous Task
-                </button>
-
-                <div className="text-sm text-gray-600 text-center order-first sm:order-none">
-                  Task {currentTaskIndexInDomain + 1} of {currentDomainTasks.length}
-                </div>
-
-                <button
-                  onClick={goToNextTask}
-                  disabled={currentTaskIndexInDomain >= Math.min(
-                    (completedTasksByDomain[currentDomain] || []).length,
-                    currentDomainTasks.length - 1
-                  )}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium ${
-                    currentTaskIndexInDomain >= Math.min(
-                      (completedTasksByDomain[currentDomain] || []).length,
-                      currentDomainTasks.length - 1
-                    )
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-ink-700 text-white hover:bg-ink-500'
-                  }`}
-                >
-                  Next Task
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -1165,6 +1123,50 @@ const AssessmentFlow = () => {
                 {currentDomain === 'Dysgraphia' && <DysgraphiaTask onComplete={handleTaskComplete} onTaskStepComplete={handleTaskStepComplete} currentStep={currentTaskIndexInDomain} />}
                 {currentDomain === 'Dyscalculia' && <DyscalculiaTask onComplete={handleTaskComplete} onTaskStepComplete={handleTaskStepComplete} currentStep={currentTaskIndexInDomain} />}
                 {currentDomain === 'Dyspraxia' && <DyspraxiaTask onComplete={handleTaskComplete} onTaskStepComplete={handleTaskStepComplete} currentStep={currentTaskIndexInDomain} />}
+
+                {/* Task Navigation Buttons  */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-4 border-t border-gray-200 mt-6">
+                  <button
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium ${
+                      currentTaskIndexInDomain === 0
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-ink-700 text-white hover:bg-ink-500'
+                    }`}
+                    onClick={goToPreviousTask}
+                    disabled={currentTaskIndexInDomain === 0}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous Task
+                  </button>
+
+                  <div className="text-sm text-gray-600 text-center order-first sm:order-none">
+                    Task {currentTaskIndexInDomain + 1} of {currentDomainTasks.length}
+                  </div>
+
+                  <button
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium ${
+                      currentTaskIndexInDomain >= Math.min(
+                        (completedTasksByDomain[currentDomain] || []).length,
+                        currentDomainTasks.length - 1
+                      )
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-ink-700 text-white hover:bg-ink-500'
+                    }`}
+                    onClick={goToNextTask}
+                    disabled={currentTaskIndexInDomain >= Math.min(
+                      (completedTasksByDomain[currentDomain] || []).length,
+                      currentDomainTasks.length - 1
+                    )}
+                  >
+                    Next Task
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-gray-600">

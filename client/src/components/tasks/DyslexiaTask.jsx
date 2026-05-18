@@ -34,6 +34,11 @@ export default function DyslexiaTask({ onComplete, onTaskStepComplete, currentSt
   const [comprehension, setComprehension] = useState("");
   const [sequenceRecall, setSequenceRecall] = useState("");
   const [startTime] = useState(Date.now());
+  
+  // Track if all required answers are provided
+  const allWordsAnswered = wordReadings.length === WORD_READING.length;
+  const allPairsAnswered = pairAnswers.length === MINIMAL_PAIRS.length;
+  const allLettersAnswered = letterConfusions.length === LETTER_PAIRS.length;
 
   const evaluateComprehension = () => {
     const comprehensionWords = normalizeWords(comprehension);
@@ -51,36 +56,63 @@ export default function DyslexiaTask({ onComplete, onTaskStepComplete, currentSt
   };
 
   const handleWordRead = (word, correct) => {
-    setWordReadings([...wordReadings, { word, correct, time: Date.now() - startTime }]);
-    if (wordReadings.length + 1 >= WORD_READING.length) {
-      setTimeout(() => {
-        const correctCount = [...wordReadings, { word, correct }].filter(w => w.correct).length;
-        onTaskStepComplete?.({ correct: correctCount, total: WORD_READING.length });
-        setStep(1);
-      }, 300);
+    const existingIndex = wordReadings.findIndex(w => w.word === word);
+    if (existingIndex >= 0) {
+      // Update existing answer
+      const updated = [...wordReadings];
+      updated[existingIndex] = { word, correct, time: Date.now() - startTime };
+      setWordReadings(updated);
+    } else {
+      // Add new answer
+      setWordReadings([...wordReadings, { word, correct, time: Date.now() - startTime }]);
     }
   };
 
   const handlePairClick = (index, choice) => {
-    setPairAnswers([...pairAnswers, { index, choice, correct: choice === MINIMAL_PAIRS[index].correct }]);
-    if (pairAnswers.length + 1 >= MINIMAL_PAIRS.length) {
-      setTimeout(() => {
-        const correctCount = [...pairAnswers, { index, choice, correct: choice === MINIMAL_PAIRS[index].correct }].filter(p => p.correct).length;
-        onTaskStepComplete?.({ correct: correctCount, total: MINIMAL_PAIRS.length });
-        setStep(2);
-      }, 300);
+    const existingIndex = pairAnswers.findIndex(p => p.index === index);
+    if (existingIndex >= 0) {
+      // Update existing answer
+      const updated = [...pairAnswers];
+      updated[existingIndex] = { index, choice, correct: choice === MINIMAL_PAIRS[index].correct };
+      setPairAnswers(updated);
+    } else {
+      // Add new answer
+      setPairAnswers([...pairAnswers, { index, choice, correct: choice === MINIMAL_PAIRS[index].correct }]);
     }
   };
 
   const handleLetterClick = (pair, confused) => {
-    setLetterConfusions([...letterConfusions, { pair, confused }]);
-    if (letterConfusions.length + 1 >= LETTER_PAIRS.length) {
-      setTimeout(() => {
-        const correctCount = [...letterConfusions, { pair, confused }].filter(l => !l.confused).length;
-        onTaskStepComplete?.({ correct: correctCount, total: LETTER_PAIRS.length });
-        setStep(3);
-      }, 300);
+    const existingIndex = letterConfusions.findIndex(l => l.pair === pair);
+    if (existingIndex >= 0) {
+      // Update existing answer
+      const updated = [...letterConfusions];
+      updated[existingIndex] = { pair, confused };
+      setLetterConfusions(updated);
+    } else {
+      // Add new answer
+      setLetterConfusions([...letterConfusions, { pair, confused }]);
     }
+  };
+
+  const handleWordReadingSubmit = () => {
+    if (!allWordsAnswered) return;
+    const correctCount = wordReadings.filter(w => w.correct).length;
+    onTaskStepComplete?.({ correct: correctCount, total: WORD_READING.length });
+    setStep(1);
+  };
+
+  const handleMinimalPairsSubmit = () => {
+    if (!allPairsAnswered) return;
+    const correctCount = pairAnswers.filter(p => p.correct).length;
+    onTaskStepComplete?.({ correct: correctCount, total: MINIMAL_PAIRS.length });
+    setStep(2);
+  };
+
+  const handleLetterDiscriminationSubmit = () => {
+    if (!allLettersAnswered) return;
+    const correctCount = letterConfusions.filter(l => !l.confused).length;
+    onTaskStepComplete?.({ correct: correctCount, total: LETTER_PAIRS.length });
+    setStep(3);
   };
 
   const handleComprehensionContinue = () => {
@@ -161,33 +193,50 @@ export default function DyslexiaTask({ onComplete, onTaskStepComplete, currentSt
               <svg className="w-6 h-6 text-ink-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path strokeLinecap="round" strokeLinejoin="round" d="M5 20v-1a7 7 0 0114 0v1" /></svg>
               <h4 className="font-semibold text-ink-700">Student Response</h4>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-            {WORD_READING.map((word, idx) => {
-              const done = wordReadings.some((w) => w.word === word);
-              return (
-                <div key={word} className="bg-white border border-slate-300 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-ink-700 mb-3">{word}</div>
-                  {!done ? (
-                    <div className="flex gap-2 justify-center">
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+              {WORD_READING.map((word, idx) => {
+                const answer = wordReadings.find(w => w.word === word);
+                return (
+                  <div key={word} className="bg-white border border-slate-300 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-ink-700 mb-3">{word}</div>
+                    <div className="flex gap-3 justify-center">
                       <button
                         onClick={() => handleWordRead(word, true)}
-                        className="px-3 py-1 rounded-md bg-mint-300 text-ink-700 text-sm"
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          answer?.correct === true
+                            ? "bg-ink-700 text-white"
+                            : "bg-gray-200 text-ink-700 hover:bg-gray-300"
+                        }`}
                       >
                         ✓ Correct
                       </button>
                       <button
                         onClick={() => handleWordRead(word, false)}
-                        className="px-3 py-1 rounded-md bg-coral-400 text-white text-sm"
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          answer?.correct === false
+                            ? "bg-ink-700 text-white"
+                            : "bg-gray-200 text-ink-700 hover:bg-gray-300"
+                        }`}
                       >
                         ✗ Incorrect
                       </button>
                     </div>
-                  ) : (
-                    <span className="text-xs text-ink-500">Recorded</span>
-                  )}
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
+              </div>
+              <button
+                onClick={handleWordReadingSubmit}
+                disabled={!allWordsAnswered}
+                className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                  allWordsAnswered
+                    ? "bg-ink-700 text-white hover:bg-ink-500 cursor-pointer"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                Submit
+              </button>
             </div>
           </div>
         </div>
@@ -228,30 +277,41 @@ export default function DyslexiaTask({ onComplete, onTaskStepComplete, currentSt
               <svg className="w-6 h-6 text-ink-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path strokeLinecap="round" strokeLinejoin="round" d="M5 20v-1a7 7 0 0114 0v1" /></svg>
               <h4 className="font-semibold text-ink-700">Student Response</h4>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-4">
             {MINIMAL_PAIRS.map((item, idx) => {
-              const done = pairAnswers.some((p) => p.index === idx);
+              const answer = pairAnswers.find(p => p.index === idx);
               return (
                 <div key={idx} className="bg-white border border-slate-300 rounded-lg p-4 space-y-2">
                   <p className="text-sm text-ink-600 text-center mb-3">Which word did the teacher say?</p>
-                  {!done ? (
-                    <div className="flex gap-3 justify-center">
-                      {item.pair.map((word, choice) => (
-                        <button
-                          key={word}
-                          onClick={() => handlePairClick(idx, choice)}
-                          className="px-4 py-2 rounded-md bg-ink-700 text-white hover:bg-ink-500"
-                        >
-                          {word}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs text-center text-ink-500">Recorded</p>
-                  )}
+                  <div className="flex gap-3 justify-center">
+                    {item.pair.map((word, choice) => (
+                      <button
+                        key={word}
+                        onClick={() => handlePairClick(idx, choice)}
+                        className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                          answer?.choice === choice
+                            ? "bg-ink-700 text-white"
+                            : "bg-gray-200 text-ink-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        {word}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               );
             })}
+            <button
+              onClick={handleMinimalPairsSubmit}
+              disabled={!allPairsAnswered}
+              className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                allPairsAnswered
+                  ? "bg-ink-700 text-white hover:bg-ink-500 cursor-pointer"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Submit
+            </button>
             </div>
           </div>
         </div>
@@ -283,33 +343,50 @@ export default function DyslexiaTask({ onComplete, onTaskStepComplete, currentSt
               <svg className="w-6 h-6 text-ink-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="8" r="3" /><path strokeLinecap="round" strokeLinejoin="round" d="M5 20v-1a7 7 0 0114 0v1" /></svg>
               <h4 className="font-semibold text-ink-700">Student Response</h4>
             </div>
+            <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
             {LETTER_PAIRS.map((pair) => {
-              const done = letterConfusions.some((l) => l.pair === pair);
+              const answer = letterConfusions.find(l => l.pair === pair);
               return (
                 <div key={pair} className="bg-white border border-slate-300 rounded-lg p-4 text-center">
                   <div className="text-3xl font-bold text-ink-700 mb-3">{pair}</div>
-                  {!done ? (
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => handleLetterClick(pair, false)}
-                        className="px-3 py-1 rounded-md bg-mint-300 text-ink-700 text-sm"
-                      >
-                        Clear
-                      </button>
-                      <button
-                        onClick={() => handleLetterClick(pair, true)}
-                        className="px-3 py-1 rounded-md bg-coral-400 text-white text-sm"
-                      >
-                        Confusing
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-ink-500">Recorded</span>
-                  )}
+                  <div className="flex gap-2 justify-center">
+                    <button
+                      onClick={() => handleLetterClick(pair, false)}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        answer?.confused === false
+                          ? "bg-mint-300 text-ink-700"
+                          : "bg-gray-200 text-ink-700 hover:bg-mint-200"
+                      }`}
+                    >
+                      Clear
+                    </button>
+                    <button
+                      onClick={() => handleLetterClick(pair, true)}
+                      className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                        answer?.confused === true
+                          ? "bg-coral-400 text-white"
+                          : "bg-gray-200 text-ink-700 hover:bg-coral-200"
+                      }`}
+                    >
+                      Confusing
+                    </button>
+                  </div>
                 </div>
               );
             })}
+            </div>
+            <button
+              onClick={handleLetterDiscriminationSubmit}
+              disabled={!allLettersAnswered}
+              className={`w-full px-4 py-2 rounded-md font-medium transition-colors ${
+                allLettersAnswered
+                  ? "bg-ink-700 text-white hover:bg-ink-500 cursor-pointer"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Submit
+            </button>
             </div>
           </div>
         </div>

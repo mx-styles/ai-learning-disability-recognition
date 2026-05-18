@@ -25,6 +25,37 @@ const StudentList = () => {
     fetchStudents();
   }, []);
 
+  const openAddModal = () => {
+    // Auto-generate a new student_id by finding the max numeric part of existing IDs
+    let maxNum = 0;
+    students.forEach((s) => {
+      if (!s.student_id) return;
+      const digits = String(s.student_id).replace(/\D/g, '');
+      const n = parseInt(digits, 10);
+      if (!isNaN(n) && n > maxNum) maxNum = n;
+    });
+
+    let newIdNumber;
+    if (maxNum > 0) {
+      newIdNumber = maxNum + 1;
+    } else {
+      newIdNumber = students.length + 1 || 1;
+    }
+
+    // Format ID with leading zeros for readability (e.g., 001)
+    const newId = String(newIdNumber).padStart(2, '0');
+
+    setFormData({
+      student_id: newId,
+      first_name: '',
+      last_name: '',
+      date_of_birth: '',
+      grade: '',
+      gender: ''
+    });
+    setShowAddModal(true);
+  };
+
   const fetchStudents = async () => {
     try {
       setError('');
@@ -138,7 +169,7 @@ const StudentList = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <h2 className="text-2xl font-bold text-gray-900">Students</h2>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           className="w-full sm:w-auto px-4 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
         >
           + Add Student
