@@ -29,15 +29,15 @@ function Ensure-Venv {
 
 function Install-Server {
     Write-Host "Installing server Python dependencies..."
-    & "$venvPython" -m pip install -r (Join-Path $root "server\requirements.txt")
+    & "$venvPython" -m pip install -r "$(Join-Path $root "server\requirements.txt")"
 }
 
 function Install-Client {
     Write-Host "Installing client dependencies..."
     if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-        pnpm install --prefix (Join-Path $root "client")
+        pnpm install --prefix "$(Join-Path $root "client")"
     } elseif (Get-Command npm -ErrorAction SilentlyContinue) {
-        npm install --prefix (Join-Path $root "client")
+        npm install --prefix "$(Join-Path $root "client")"
     } else {
         Write-Warning "Neither pnpm nor npm found. Please install client dependencies manually in the client/ directory."
     }
@@ -54,16 +54,16 @@ Ensure-Venv
 Write-Host "Starting backend and frontend in new PowerShell windows..."
 
 # Start the backend in a new PowerShell window
-$serverCmd = "cd `"$root`"; `"$venvPython`" `"$root\server\app.py`""
+$serverCmd = 'cd "' + $root + '"; "' + $venvPython + '" "' + $root + '\server\app.py"'
 Start-Process -FilePath pwsh -ArgumentList "-NoExit", "-Command", $serverCmd
 
 # Start the client in a new PowerShell window (prefer pnpm, fallback to npm)
 if (Get-Command pnpm -ErrorAction SilentlyContinue) {
-    $clientCmd = "cd `"$root\client`"; pnpm dev"
+    $clientCmd = 'cd "' + $root + '\client"; pnpm dev'
 } elseif (Get-Command npm -ErrorAction SilentlyContinue) {
-    $clientCmd = "cd `"$root\client`"; npm run dev"
+    $clientCmd = 'cd "' + $root + '\client"; npm run dev'
 } else {
-    $clientCmd = "cd `"$root\client`"; Write-Host 'Install pnpm or npm to start the client.'; Read-Host -Prompt 'Press Enter to close this window'"
+    $clientCmd = 'cd "' + $root + '\client"; Write-Host "Install pnpm or npm to start the client."; Read-Host -Prompt "Press Enter to close this window"'
 }
 Start-Process -FilePath pwsh -ArgumentList "-NoExit", "-Command", $clientCmd
 
