@@ -13,15 +13,15 @@ $venvDir = Join-Path $root "server\.venv"
 $venvPython = Join-Path $venvDir "Scripts\python.exe"
 
 function Ensure-Venv {
-    if (Test-Path $venvPython) {
+    if (Test-Path "$venvPython") {
         return
     }
 
     Write-Host "Creating Python virtual environment in .venv..."
     if (Get-Command py -ErrorAction SilentlyContinue) {
-        & py -3 -m venv $venvDir
+        & py -3 -m venv "$venvDir"
     } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-        & python -m venv $venvDir
+        & python -m venv "$venvDir"
     } else {
         throw "Python was not found. Install Python 3 or the Python launcher and try again."
     }
@@ -29,7 +29,7 @@ function Ensure-Venv {
 
 function Install-Server {
     Write-Host "Installing server Python dependencies..."
-    & $venvPython -m pip install -r (Join-Path $root "server\requirements.txt")
+    & "$venvPython" -m pip install -r (Join-Path $root "server\requirements.txt")
 }
 
 function Install-Client {
