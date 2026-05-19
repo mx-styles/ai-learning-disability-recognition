@@ -326,6 +326,7 @@ const StudentList = () => {
                 <input
                   type="text"
                   required
+                  readOnly
                   value={formData.student_id}
                   onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
@@ -381,7 +382,7 @@ const StudentList = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   >
                     <option value="">Select</option>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                    {[1, 2, 3, 4, 5, 6, 7].map(g => (
                       <option key={g} value={g}>{g}</option>
                     ))}
                   </select>

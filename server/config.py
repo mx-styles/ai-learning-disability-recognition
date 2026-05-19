@@ -24,7 +24,7 @@ class Config:
     
     # Age and grade normalization parameters
     AGE_RANGE = (6, 18)  # Years
-    GRADE_RANGE = (1, 12)
+    GRADE_RANGE = (1, 7)
     
     # Risk level thresholds
     RISK_THRESHOLDS = {
