@@ -67,7 +67,7 @@ const Login = () => {
         <div className="rounded-3xl bg-gray-900 text-white shadow-xl p-8 lg:p-10">
           <h2 className="text-2xl font-semibold">Sign in</h2>
           <p className="mt-2 text-sm text-gray-300">
-            Use your assigned account. The initial admin credentials are available from the local setup.
+            Use your staff account to access the dashboard and manage student assessments.
           </p>
 
           {error && (
@@ -81,10 +81,8 @@ const Login = () => {
               <span className="mb-2 block text-sm font-medium text-gray-200">Username</span>
               <input
                 type="text"
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
                 className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-400 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                placeholder="admin"
+                placeholder="Enter your username"
                 autoComplete="username"
               />
             </label>
@@ -93,10 +91,8 @@ const Login = () => {
               <span className="mb-2 block text-sm font-medium text-gray-200">Password</span>
               <input
                 type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
                 className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-400 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 autoComplete="current-password"
               />
             </label>
@@ -109,11 +105,6 @@ const Login = () => {
               {submitting ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
-
-          <div className="mt-6 rounded-2xl bg-white/5 p-4 text-sm text-gray-300">
-            Default local setup: username <span className="font-semibold text-white">admin</span>, password{' '}
-            <span className="font-semibold text-white">admin123</span>
-          </div>
         </div>
       </div>
     </div>
