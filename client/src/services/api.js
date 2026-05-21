@@ -20,6 +20,43 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+let unauthorizedHandler = null;
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 && typeof unauthorizedHandler === 'function') {
+      unauthorizedHandler(error);
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const registerUnauthorizedHandler = (handler) => {
+  unauthorizedHandler = handler;
+};
+
+export const setApiToken = (token) => {
+  if (token) {
+    apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common.Authorization;
+  }
+};
+
+export const getStoredToken = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.localStorage.getItem('auth_token');
+};
+
+const storedToken = getStoredToken();
+if (storedToken) {
+  setApiToken(storedToken);
+}
+
 // Student API
 export const studentAPI = {
   getAll: (params) => apiClient.get('/students', { params }),
@@ -28,6 +65,18 @@ export const studentAPI = {
   update: (id, data) => apiClient.put(`/students/${id}`, data),
   delete: (id) => apiClient.delete(`/students/${id}`),
   getHistory: (id) => apiClient.get(`/students/${id}/history`),
+};
+
+// Auth API
+export const authAPI = {
+  login: (credentials) => apiClient.post('/auth/login', credentials),
+  logout: () => apiClient.post('/auth/logout'),
+  me: () => apiClient.get('/auth/me'),
+  updateProfile: (data) => apiClient.put('/auth/profile', data),
+  listUsers: () => apiClient.get('/auth/users'),
+  createUser: (data) => apiClient.post('/auth/users', data),
+  updateUser: (id, data) => apiClient.put(`/auth/users/${id}`, data),
+  deleteUser: (id) => apiClient.delete(`/auth/users/${id}`),
 };
 
 // Assessment API

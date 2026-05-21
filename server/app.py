@@ -3,12 +3,14 @@ Main Flask Application for Learning Disability Screening System
 Fully offline INTELLIGENT LEARNING DISABILITY RECOGNITION SYSTEM
 """
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, g, request
 from flask_cors import CORS
 import os
 
 from config import Config
 from models import db
+from auth_utils import get_user_from_request
+from routes.auth_routes import auth_bp, ensure_default_admin
 
 def create_app(config_class=Config):
     """Application factory pattern"""
@@ -38,6 +40,7 @@ def create_app(config_class=Config):
     os.makedirs(os.path.join(app.config['BASE_DIR'], 'database'), exist_ok=True)
     
     # Register blueprints
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
     from routes.student_routes import student_bp
     from routes.assessment_routes import assessment_bp
     from routes.analysis_routes import analysis_bp
@@ -51,6 +54,33 @@ def create_app(config_class=Config):
     app.register_blueprint(recommendation_bp, url_prefix='/api/recommendations')
     app.register_blueprint(report_routes, url_prefix='/api/reports')
     app.register_blueprint(dysgraphia_image_bp, url_prefix='/api/dysgraphia-image')
+
+    @app.before_request
+    def enforce_api_auth():
+        if request.method == 'OPTIONS' or not request.path.startswith('/api/'):
+            return None
+
+        if request.path.startswith('/api/health') or request.path.startswith('/api/auth/login'):
+            return None
+
+        if request.path.startswith('/api/auth'):
+            if request.path.startswith('/api/auth/logout') or request.path.startswith('/api/auth/me') or request.path.startswith('/api/auth/profile'):
+                user = get_user_from_request()
+                if not user:
+                    return jsonify({'success': False, 'error': 'Authentication required'}), 401
+                g.current_user = user
+            return None
+
+        user = get_user_from_request()
+        if not user:
+            return jsonify({'success': False, 'error': 'Authentication required'}), 401
+        g.current_user = user
+
+    with app.app_context():
+        db.create_all()
+        seed_info = ensure_default_admin()
+        if seed_info:
+            print(f"✓ Default admin created: {seed_info['username']} / {seed_info['password']}")
     
     # Health check endpoint
     @app.route('/api/health', methods=['GET'])
@@ -77,12 +107,6 @@ def create_app(config_class=Config):
 
 if __name__ == '__main__':
     app = create_app()
-    
-    # Create all database tables
-    with app.app_context():
-        db.create_all()
-        print("✓ Database initialized successfully")
-        print("✓ All tables created")
     
     print("\n" + "="*50)
     print("Learning Disability Screening System - Backend")

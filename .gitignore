@@ -15,11 +15,6 @@ build/
 instance/
 .webassets-cache
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
 # ML Models
 server/ml_models/saved_models/
 server/ml_models/dysgraphia_image/artifacts/

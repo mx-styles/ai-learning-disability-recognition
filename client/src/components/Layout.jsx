@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const iconClass = 'w-5 h-5';
 
@@ -53,6 +54,8 @@ const WarningIcon = () => (
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navigation = [
     { name: 'Home', path: '/', icon: <HomeIcon /> },
@@ -60,6 +63,15 @@ const Layout = ({ children }) => {
     { name: 'Students', path: '/students', icon: <UsersIcon /> },
     { name: 'Dashboard', path: '/dashboard', icon: <ChartIcon /> },
   ];
+
+  if (user?.role === 'admin') {
+    navigation.push({ name: 'Users', path: '/users', icon: <UsersIcon /> });
+  }
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -77,6 +89,19 @@ const Layout = ({ children }) => {
                 </h1>
                 <p className="text-xs sm:text-sm text-gray-500">Educational Assessment Tool</p>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-medium text-gray-900">{user?.full_name || user?.username}</div>
+                <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                Log out
+              </button>
             </div>
           </div>
         </div>
@@ -112,7 +137,7 @@ const Layout = ({ children }) => {
       {/* Main Content */}
       <main className="flex-1 bg-gray-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
-          {children}
+          {children || <Outlet />}
         </div>
       </main>
 

@@ -18,6 +18,7 @@ def init_database():
         print("✓ Database location: server/database/learning_disability.db")
         print("✓ All tables created:")
         print("  - students")
+        print("  - users")
         print("  - assessment_sessions")
         print("  - task_results")
         print("  - extracted_features")
