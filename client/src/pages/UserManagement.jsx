@@ -230,7 +230,6 @@ const UserManagement = () => {
                   >
                     <option value="teacher">Teacher</option>
                     <option value="admin">Admin</option>
-                    <option value="observer">Observer</option>
                   </select>
                 </label>
                 <label className="block">

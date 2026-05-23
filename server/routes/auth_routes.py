@@ -14,7 +14,7 @@ auth_bp = Blueprint('auth', __name__)
 
 def _normalize_role(role):
     role_value = (role or 'teacher').strip().lower()
-    if role_value not in {'admin', 'teacher', 'observer'}:
+    if role_value not in {'admin', 'teacher'}:
         return None
     return role_value
 
